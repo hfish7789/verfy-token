@@ -12,7 +12,7 @@ const portHttps = Number(process.env.HTTPS_PORT || 443)
 var con = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "",
+    password: "123456",
     database: "database"
   });
   con.connect(function (err) {
