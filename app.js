@@ -7,7 +7,7 @@ const cors = require('cors')
 const shrinkRay = require('shrink-ray-current')
 const fileUpload = require('express-fileupload');
 var mysql = require('mysql');
-const port = Number(process.env.HTTP_PORT || 5000)
+const port = Number(process.env.HTTP_PORT || 80)
 const portHttps = Number(process.env.HTTPS_PORT || 443)
 var con = mysql.createConnection({
     host: "localhost",
