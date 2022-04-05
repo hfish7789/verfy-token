@@ -37,6 +37,7 @@ const execute = (sql, params) => {
 (async ()=>{
     const app = express()
     const server = http.createServer(app)
+    app.use(express.static(path.normalize(__dirname + '/public')));
     let httpsServer = null
     const file_key = __dirname+'/certs/ssl.key';
     const file_crt = __dirname+'/certs/ssl.crt';
@@ -143,6 +144,16 @@ const execute = (sql, params) => {
             }
           })
     })
+    app.post('/get_list_ads',function(req,res){
+      con.query("SELECT * FROM ads_list WHERE status = 'Active' ORDER BY id DESC;", function (err, result) {
+          if (result && result.length > 0) {
+            res.json(result)
+          }
+          else {
+            res.json({});
+          }
+        })
+  })
     app.post('/change_status',function(req,res){
         var sql = "UPDATE ads_list SET status = '" + req.body.status + "' WHERE id = '"+req.body.id+"'";
         con.query(sql, function (err, result) {
