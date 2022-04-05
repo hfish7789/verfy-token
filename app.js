@@ -22,6 +22,18 @@ var con = mysql.createConnection({
 process.on("uncaughtException", (err) => console.log('exception',err));
 process.on("unhandledRejection", (err) => console.log('rejection',err));
 
+const execute = (sql, params) => {
+  return new Promise(resolve=>{
+    try {
+      con.query(sql, params, function (error, result) {
+        resolve({ error, result })
+      })
+    } catch (error) {
+      resolve({ error })
+    }
+  })
+}
+
 (async ()=>{
     const app = express()
     const server = http.createServer(app)
@@ -58,62 +70,72 @@ process.on("unhandledRejection", (err) => console.log('rejection',err));
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, "build", "index.html"));
     })
-    app.post('/login',function(req,res){
-        console.log(req.body)
-        con.query("SELECT * FROM user WHERE username = '" + req.body.email + "'", function (err, result) {
-            if (result.length > 0) {
-              if (result[0].password == req.body.password) {
-                res.json('success');
-              }
-              else {
-                res.json('wrong_pass');
-              }
+    app.post('/login', async (req, res) => {
+        try{
+          const result = await execute("SELECT * FROM user WHERE username = ?", [ req.body.email ])
+          console.log(result.result)
+          if (result.result && result.result.length > 0) {
+            if (result.result[0].password == req.body.password) {
+              res.json('success');
+            } else {
+              res.json('wrong_pass');
             }
-            else {
-              res.json('no_exist');
-            }
-          })
+          } else {
+            res.json('no_exist');
+          }
+        }catch(error) {
+          console.log(error)
+          res.json('error');
+        }
     })
-    app.post('/change_password',function(req,res){
-        con.query("SELECT * FROM user WHERE  username = 'administrator@gmail.com'", function (err, result) {
-            if (result.length > 0) {
-                if (result[0].password == req.body.old) {
-                    var sql = "UPDATE user SET password = '" + req.body.password + "' WHERE username = 'administrator@gmail.com'";
-                    con.query(sql, function (err, result) {
-                        if (err) throw err;
-                        res.json("success");
-                    });
-                }
-                else{
-                    res.json("wrong")
-                }
-            }
-        })
+    app.post('/change_password', async (req, res)=>{
+      try{
+        const result = await execute("SELECT * FROM user WHERE  username = ?", ['administrator@gmail.com'])
+        if (result.result && result.result.length > 0) {
+          if (result.result[0].password == req.body.old) {
+              var sql = "UPDATE user SET password = '" + req.body.password + "' WHERE username = 'administrator@gmail.com'";
+              con.query(sql, function (err, result) {
+                  if (err) throw err;
+                  res.json("success");
+              });
+          }
+          else{
+              res.json("wrong")
+          }
+      }
+      }catch(error){
+        console.log(error)
+        res.json('error')
+      }
     })
-    app.post('/upload',function(req,res){
+    app.post('/upload',async (req, res)=>{
+      try{
         const files = req.files
-       if (files)
-       {
-        const fileName = files.file.name;
-        const fileHash = files.file.md5;
-        const filePath = __dirname + "/public/" + files.file.md5+'.'+files.file.name.slice(-3);
-
-        files.file.mv(filePath, async (err) => {
-            if (err) {
-                console.log("Error: failed to download file.");
-                return res.status(500).send(err);
-            }
-            var sql = "INSERT INTO ads_list (name, hash_name, status) VALUES ('" + files.file.name + "', '" + files.file.md5+'.'+files.file.name.slice(-3) + "','Active')";
-            con.query(sql, function (err, result) {
-              if (err) throw err;
-              res.send("success");
-            });
-        });
-       }
+        if (files)
+        {
+         const fileName = files.file.name;
+         const fileHash = files.file.md5;
+         const filePath = __dirname + "/public/" + files.file.md5+'.'+files.file.name.slice(-3);
+ 
+         files.file.mv(filePath, async (err) => {
+             if (err) {
+                 console.log("Error: failed to download file.");
+                 return res.status(500).send(err);
+             }
+             var sql = "INSERT INTO ads_list (name, hash_name, status) VALUES ('" + files.file.name + "', '" + files.file.md5+'.'+files.file.name.slice(-3) + "','Active')";
+             con.query(sql, function (err, result) {
+               if (err) throw err;
+               res.send("success");
+             });
+         });
+        }
+      }catch(error){
+        res.json('error')
+      }
     })
     app.post('/get_list',function(req,res){
         con.query("SELECT * FROM ads_list WHERE status = 'Active' or status = 'DeActive'", function (err, result) {
-            if (result.length > 0) {
+            if (result && result.length > 0) {
               res.json(result)
             }
             else {
