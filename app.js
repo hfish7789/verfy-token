@@ -134,8 +134,19 @@ const execute = (sql, params) => {
         res.json('error')
       }
     })
-    app.post('/get_list',function(req,res){
-        con.query("SELECT * FROM ads_list WHERE status = 'Active' or status = 'DeActive'", function (err, result) {
+        app.post('/get_list',function(req,res){
+          con.query("SELECT * FROM ads_list WHERE status = 'Active' or status = 'DeActive'", function (err, result) {
+              if (result && result.length > 0) {
+                res.json(result)
+              }
+              else {
+                res.json({});
+              }
+            })
+      })
+      app.post('/get_list_ads',function(req,res){
+        try{
+          con.query("SELECT * FROM ads_list WHERE status = 'Active' ORDER BY id DESC;", function (err, result) {
             if (result && result.length > 0) {
               res.json(result)
             }
@@ -143,24 +154,24 @@ const execute = (sql, params) => {
               res.json({});
             }
           })
+        }
+        catch(error){
+            res.json('error')
+        }
+      
     })
-    app.post('/get_list_ads',function(req,res){
-      con.query("SELECT * FROM ads_list WHERE status = 'Active' ORDER BY id DESC;", function (err, result) {
-          if (result && result.length > 0) {
-            res.json(result)
-          }
-          else {
-            res.json({});
-          }
-        })
-  })
-    app.post('/change_status',function(req,res){
-        var sql = "UPDATE ads_list SET status = '" + req.body.status + "' WHERE id = '"+req.body.id+"'";
-        con.query(sql, function (err, result) {
-            if (err) throw err;
-            res.json("success");
-        });
-    })
+      app.post('/change_status',function(req,res){
+        try{
+          var sql = "UPDATE ads_list SET status = '" + req.body.status + "' WHERE id = '"+req.body.id+"'";
+          con.query(sql, function (err, result) {
+              if (err) throw err;
+              res.json("success");
+          });
+        }catch(error){
+          res.json('error')
+        }
+        
+      })
     let time = +new Date()
     await new Promise(resolve=>server.listen({ port, host:'0.0.0.0' }, ()=>resolve(true)))
     console.log(`Started HTTP service on port ${port}. ${+new Date()-time}ms`)
