@@ -21,13 +21,13 @@ lib-cov
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov
-
+certs
 # nyc test coverage
 .nyc_output
-
+.vscode
 # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
-
+yarn.lock
 # Bower dependency directory (https://bower.io/)
 bower_components
 

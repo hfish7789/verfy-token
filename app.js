@@ -39,16 +39,17 @@ const execute = (sql, params) => {
     const server = http.createServer(app)
     app.use(express.static(path.normalize(__dirname + '/public')));
     let httpsServer = null
-    const file_key = __dirname+'/certs/ssl.key';
-    const file_crt = __dirname+'/certs/ssl.crt';
-    const file_ca = __dirname+'/certs/ssl.ca-bundle';
-    if (fs.existsSync(file_key) && fs.existsSync(file_crt) && fs.existsSync(file_ca)) {
+
+    const file_key = __dirname+'/certs/verifylens.com.key';
+    const file_crt = __dirname+'/certs/verifylens.com.cer';
+    // const file_ca = __dirname+'/certs/ssl.ca-bundle';
+    if (fs.existsSync(file_key) && fs.existsSync(file_crt) ) { // && fs.existsSync(file_ca)
         const key = fs.readFileSync(file_key, 'utf8')
         const cert = fs.readFileSync(file_crt, 'utf8')
-        const caBundle = fs.readFileSync(file_ca, 'utf8')
+        /* const caBundle = fs.readFileSync(file_ca, 'utf8')
         const ca = caBundle.split('-----END CERTIFICATE-----\n') .map((cert) => cert +'-----END CERTIFICATE-----\n')
-        ca.pop()
-        const options = {cert,key,ca}
+        ca.pop() */
+        const options = {cert,key} // ,ca
         httpsServer = https.createServer(options,app)
         initSocket(httpsServer)
     } else {
