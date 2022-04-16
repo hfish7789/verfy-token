@@ -51,7 +51,7 @@ const execute = (sql, params) => {
         ca.pop() */
         const options = {cert,key} // ,ca
         httpsServer = https.createServer(options,app)
-        initSocket(httpsServer)
+        // initSocket(httpsServer)
     } else {
         console.log("Do not find ssl files, disabled ssl features.")
     }
