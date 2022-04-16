@@ -67,12 +67,14 @@ const execute = (sql, params) => {
       
     app.use(express.urlencoded())
     app.use(express.json())
-
+    app.get('*', (req, res, next) => {
+        if (req.protocol==='http') {
+          return res.redirect('https://' + req.hostname + req.url)
+        }
+        next()
+    })
     app.use(express.static(path.normalize(__dirname + '/build')))
     app.get('*', (req, res) => {
-        if (req.protocol==='http') {
-          return res.redirect('https://' + req.hostname + '/' + req.url)
-        }
         res.sendFile(path.join(__dirname, "build", "index.html"));
     })
     app.post('/login', async (req, res) => {
