@@ -117,13 +117,12 @@ const execute = (sql, params) => {
          const fileName = files.file.name;
          const fileHash = files.file.md5;
          const filePath = __dirname + "/public/" + files.file.md5+'.'+files.file.name.slice(-3);
- 
          files.file.mv(filePath, async (err) => {
              if (err) {
                  console.log("Error: failed to download file.");
                  return res.status(500).send(err);
              }
-             var sql = "INSERT INTO ads_list (name, hash_name, status) VALUES ('" + files.file.name + "', '" + files.file.md5+'.'+files.file.name.slice(-3) + "','Active')";
+             var sql = "INSERT INTO ads_list (name, hash_name, status,url) VALUES ('" + files.file.name + "', '" + files.file.md5+'.'+files.file.name.slice(-3) + "','Active','"+req.body.url+"')";
              con.query(sql, function (err, result) {
                if (err) throw err;
                res.send("success");
