@@ -13,7 +13,7 @@ var con = mysql.createConnection({
     host: "localhost",
     user: "root",
     password: "WbH7b24yH7atJJ6D",
-    database: "database"
+    database: "verifylensdb"
   });
   con.connect(function (err) {
     if (err) throw err;
