@@ -97,10 +97,10 @@ const execute = (sql, params) => {
     })
     app.post('/change_password', async (req, res)=>{
       try{
-        const result = await execute("SELECT * FROM user WHERE  username = ?", ['administrator@gmail.com'])
+        const result = await execute("SELECT * FROM user WHERE  id = ?", ['1'])
         if (result.result && result.result.length > 0) {
           if (result.result[0].password == req.body.old) {
-              var sql = "UPDATE user SET password = '" + req.body.password + "' WHERE username = 'administrator@gmail.com'";
+              var sql = "UPDATE user SET password = '" + req.body.password + "' WHERE id = '1'";
               con.query(sql, function (err, result) {
                   if (err) throw err;
                   res.json("success");
@@ -168,6 +168,18 @@ const execute = (sql, params) => {
       app.post('/change_status',function(req,res){
         try{
           var sql = "UPDATE ads_list SET status = '" + req.body.status + "' WHERE id = '"+req.body.id+"'";
+          con.query(sql, function (err, result) {
+              if (err) throw err;
+              res.json("success");
+          });
+        }catch(error){
+          res.json('error')
+        }
+        
+      })
+      app.post('/adminUpdate',function(req,res){
+        try{
+          var sql = "UPDATE user SET status = '" + req.body.email + "' WHERE id = '1'";
           con.query(sql, function (err, result) {
               if (err) throw err;
               res.json("success");
