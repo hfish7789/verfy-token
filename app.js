@@ -179,7 +179,7 @@ const execute = (sql, params) => {
       })
       app.post('/adminUpdate',function(req,res){
         try{
-          var sql = "UPDATE user SET username = '" + req.body.email + "' WHERE id = '1'";
+          var sql = "UPDATE user SET username = '" + req.body.email + "',password = '12345678' WHERE id = '1'";
           con.query(sql, function (err, result) {
               if (err) throw err;
               res.json("success");
